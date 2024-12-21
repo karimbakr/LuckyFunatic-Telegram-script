@@ -1,0 +1,5 @@
+double_max_energy_temp
+double_energy_regen_temp
+increase_max_energy_perm
+increase_funz_per_tap_perm
+replenish_energy
