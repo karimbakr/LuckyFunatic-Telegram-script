@@ -1,2 +1,2 @@
 # LuckyFunatic-Telegram-script
-Auto tap auto quests 
+Auto tap auto quests auto booster 
