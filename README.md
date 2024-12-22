@@ -1,5 +1,8 @@
 # LuckyFunatic-Telegram-script
-Auto tap auto quests auto booster 
+Auto tap 
+auto quests 
+auto booster 
+auto login 
 
 link bot:
 https://t.me/LuckyFunaticBot/lucky_funatic?startapp=707813877
