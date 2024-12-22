@@ -9,7 +9,7 @@ import importlib.util
 import pyfiglet
 import  subprocess
 import sys
-libraries = ["httpx", "requests", "colorama", "rich", "pyfiglet"]
+libraries = ["httpx", "requests", "colorama", "rich", "pyfiglet","aiohttp","asyncio"]
 # تهيئة مكتبة colorama
 init(autoreset=True)
 def clear_screen():
@@ -259,7 +259,7 @@ async def process_questss(token):
 
 # دالة claim_join_x لتنفيذ العمل على كل quest ID (يمكنك تخصيص هذا بناءً على احتياجاتك)
 async def claim_join_x(token, quest_id):
-    url = f"https://api2.funtico.com/api/claim/{quest_id}"
+    url = f"https://api2.funtico.com/api/{quest_id}/claim"
 
     headers = {
         'User-Agent': get_user_agent(),
@@ -296,7 +296,7 @@ async def claim_join_x(token, quest_id):
 
 # دالة claim_join_y (مثل claim_join_x لكن يمكن تخصيصها بما يناسب)
 async def claim_join_y(token, quest_id):
-    url = f"https://api2.funtico.com/api/claim/{quest_id}"
+    url = f"https://api2.funtico.com/api/{quest_id}/Start"
 
     headers = {
         'User-Agent': get_user_agent(),
@@ -324,12 +324,13 @@ async def claim_join_y(token, quest_id):
                     if response_json.get("status") == "success":
                         print(f"{Fore.CYAN}[{get_current_time()}] {Fore.GREEN}Quest {quest_id} completed successfully.")
                     else:
-                        print(f"{Fore.CYAN}[{get_current_time()}] {Fore.RED}Failed to claim quest {quest_id}")
+                        print(f"{Fore.CYAN}[{get_current_time()}] {Fore.RED}Failed to Start quest {quest_id}")
                 except json.JSONDecodeError:
                     print(f"{Fore.CYAN}[{get_current_time()}] {Fore.RED}Failed to decode JSON response")
                     print(f"{Fore.CYAN}[{get_current_time()}] {Fore.RED}Response Text:", response_text)
             else:
                 print(f"{Fore.CYAN}[{get_current_time()}] {Fore.RED}Failed to claim quest {quest_id}. Status code: {response.status}")
+                
 async def get_current_energy_balance(token):
     url = "https://clicker.api.funtico.com/game"
     headers = {
@@ -374,7 +375,7 @@ async def send_tap_request(token):
         token = await send_request()
         url = "https://clicker.api.funtico.com/tap"
         payload = {
-            "taps": 1
+            "taps": 3
         }
 
         headers = {
@@ -439,6 +440,7 @@ async def fetch_and_save_type(token):
 
 
 async def send_boosters(token):
+    token = await send_request()
     url = "https://clicker.api.funtico.com/boosters/activate"
     headers = {
         'User-Agent': get_user_agent(),
@@ -479,7 +481,8 @@ async def send_boosters(token):
 
             # انتظار 3 ساعات قبل التكرار
             print(f"{Fore.CYAN}[{get_current_time()}] {Fore.GREEN}All Booster is Done :  ✅ watting next bosster ...")
-            await asyncio.sleep(3 * 60 * 60)  # 3 ساعات
+            await asyncio.sleep(3 * 60 * 60) 
+            await send_boosters(token) # 3 ساعات
         except Exception as e:
             print(f"حدث خطأ: {e}")
 
@@ -496,8 +499,9 @@ async def main():
         await claim_daily_bonus(token)
         await get_quests_and_save_id(token)
         await fetch_and_save_type(token)
-        await process_quests(token)
         await process_questss(token)
+        await proces_quests(token)
+        
         
         await asyncio.gather(
             send_boosters(token),
