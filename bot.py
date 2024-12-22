@@ -500,7 +500,7 @@ async def main():
         await get_quests_and_save_id(token)
         await fetch_and_save_type(token)
         await process_questss(token)
-        await proces_quests(token)
+        await process_quests(token)
         
         
         await asyncio.gather(
