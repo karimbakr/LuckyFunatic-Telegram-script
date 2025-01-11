@@ -108,6 +108,45 @@ async def send_request():
                 print(f"{Fore.CYAN}[{get_current_time()}] {Fore.RED}Failed to decode JSON response")
                 print(f"{Fore.CYAN}[{get_current_time()}] {Fore.RED}Response Text:", response_text)
 
+async def purchase_item(token):
+    url = "https://clicker.api.funtico.com/store/purchase"
+    
+    params = {
+        '_t': "1736446736341"
+    }
+    
+    payload = {
+        "listing_id": 32,
+        "quantity": 1
+    }
+    
+    headers = {
+        'User-Agent': "Mozilla/5.0 (Linux; Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.135 Mobile Safari/537.36 Telegram-Android/11.6.1 (Nubia NX729J; Android 14; SDK 34; HIGH)",
+        'Accept': "application/json",
+        'Accept-Encoding': "gzip, deflate, br, zstd",
+        'Content-Type': "application/json",
+        'sec-ch-ua-platform': "\"Android\"",
+        'authorization': f"Bearer {token}",
+        'sec-ch-ua': "\"Android WebView\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
+        'sec-ch-ua-mobile': "?1",
+        'origin': "https://clicker.funtico.com",
+        'x-requested-with': "org.telegram.messenger",
+        'sec-fetch-site': "same-site",
+        'sec-fetch-mode': "cors",
+        'sec-fetch-dest': "empty",
+        'referer': "https://clicker.funtico.com/",
+        'accept-language': "en,en-US;q=0.9",
+        'priority': "u=1, i"
+    }
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, params=params, data=json.dumps(payload), headers=headers) as response:
+            result = await response.text()
+            print(f"{Fore.CYAN}[{get_current_time()}] {Fore.GREEN}Buy Joker Cion: {Fore.YELLOW}[{result}]")
+            print(result)
+
+# تشغيل الدالة
+
 # دالة لعرض بيانات المستخدم
 async def get_user_data(token):
     url = "https://api2.funtico.com/api/lucky-funatic/user"
@@ -360,6 +399,8 @@ async def get_current_energy_balance(token):
                     current_energy = response_json['data']['energy'].get("currentEnergyBalance", "Energy not found")
                     print(f"{Fore.CYAN}[{get_current_time()}] {Fore.GREEN}You Energy:  [{current_energy}]")
                     blance =  response_json['data']['funz'].get("currentFunzBalance", "Energy not found")
+                    if blance >= 500000:
+                    	await purchase_item(token)
                    # print(f"{Fore.YELLOW}blance: [{int(blance)}]")
                     if current_energy <= 50:
                     	print(f"{Fore.RED}Failed energy....")
@@ -489,26 +530,38 @@ async def send_boosters(token):
 # تشغيل الدالة
                           
 # الدالة الرئيسية لتشغيل العملية
+import asyncio
+
 async def main():
     create_gradient_banner("LuckyFunatic")  # عرض الشعار
-    print_info_box([("Telegram", "https://t.me/YOU742"),("Click on linke ","to open"), ("Coder", "@Ke4oo")])  # معلومات وسائل التواصل
-    token = await send_request()  # الحصول على الـ token بعد التسجيل
+    print_info_box([("Telegram", "https://t.me/YOU742"), ("Click on link", "to open"), ("Coder", "@Ke4oo")])  # معلومات وسائل التواصل
+    
+    # الحصول على التوكن بعد التسجيل
+    token = await send_request()
+    
     if token != "Token not found":
-        
-        await get_user_data(token)  # الحصول على بيانات المستخدم
+        # تنفيذ العمليات الأساسية
+        await get_user_data(token)
         await claim_daily_bonus(token)
         await get_quests_and_save_id(token)
         await fetch_and_save_type(token)
         await process_questss(token)
         await process_quests(token)
         
+        # قائمة التوكنات
+        tokens = [token]  # هنا يمكنك إضافة المزيد من التوكنات إذا كانت متوفرة
         
-        await asyncio.gather(
-            send_boosters(token),
-            send_tap_request(token),
-            
-            
-        )
-# تشغيل السكربت
+        # إنشاء قائمة مهام لكل توكن
+        tasks = [
+            asyncio.gather(
+                send_boosters(t),
+                send_tap_request(t)
+            )
+            for t in tokens
+        ]
+        
+        # تنفيذ جميع المهام بالتوازي
+        await asyncio.gather(*tasks)
 
+# تشغيل السكربت
 asyncio.run(main())
