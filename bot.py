@@ -416,7 +416,7 @@ async def send_tap_request(token):
         token = await send_request()
         url = "https://clicker.api.funtico.com/tap"
         payload = {
-            "taps": 3
+            "taps": 23
         }
 
         headers = {
